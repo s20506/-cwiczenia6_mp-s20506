@@ -56,4 +56,34 @@ public class DbService : IDbService
         });
         await _dbContext.SaveChangesAsync();
     }
+
+    public async Task<PrescriptionDto?> GetPrescription(int idPrescription)
+    {
+        return await _dbContext.Prescriptions.Select(e => new PrescriptionDto()
+            {
+                Id = e.IdDoctor,
+                Date = e.Date,
+                DueDate = e.DueDate,
+                Patient = new PatientDto()
+                {
+                    Id = e.Patient.IdPatient, FirstName = e.Patient.FirstName, LastName = e.Patient.LastName,
+                    Birthdate = e.Patient.Birthdate
+                },
+                Doctor = new DoctorDto()
+                {
+                    Id = e.Doctor.IdDoctor, FirstName = e.Doctor.FirstName, LastName = e.Doctor.LastName,
+                    Email = e.Doctor.Email
+                },
+                Medicaments = e.PrescriptionMedicaments.Select(pm => pm)
+                    .Where(pm => pm.IdPrescription == e.IdPrescription)
+                    .Select(pm => new MedicamentDto()
+                    {
+                        Id = pm.Medicament.IdMedicament, Name = pm.Medicament.Name,
+                        Description = pm.Medicament.Description, Type = pm.Medicament.Type
+                    })
+                    .ToList()
+            })
+            .Where(e => e.Id == idPrescription)
+            .SingleOrDefaultAsync();
+    }
 }

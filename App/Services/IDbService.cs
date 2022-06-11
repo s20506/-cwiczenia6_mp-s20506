@@ -11,4 +11,6 @@ public interface IDbService
     Task UpdateDoctor(int idDoctor, UpdateDoctorDto dto);
     
     Task DeleteDoctor(int idDoctor);
+
+    Task<PrescriptionDto?> GetPrescription(int idPrescription);
 }
